@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1a1a2e">
+  <title>بازی فلش</title>
+
+  <!-- Eitaa WebApp SDK — loaded before all application scripts -->
+  <script src="https://developer.eitaa.com/eitaa-web-app.js"></script>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/game.css">
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════
+       LOADING SCREEN
+  ══════════════════════════════════════════════ -->
+  <div id="screen-loading" class="screen screen--active" aria-live="polite" aria-label="در حال بارگذاری">
+    <div class="loading-inner">
+      <div class="loading-logo" aria-hidden="true">
+        <span class="logo-arrow">↑</span>
+        <span class="logo-arrow">→</span>
+        <span class="logo-arrow">↓</span>
+        <span class="logo-arrow">←</span>
+      </div>
+      <p class="loading-text">در حال بارگذاری…</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       ERROR SCREEN
+  ══════════════════════════════════════════════ -->
+  <div id="screen-error" class="screen" role="alert" aria-label="خطا">
+    <div class="error-inner">
+      <p class="error-icon" aria-hidden="true">⚠</p>
+      <h2 class="error-title">مشکلی پیش آمد</h2>
+      <p id="error-message" class="error-body">خطای ناشناخته</p>
+      <button id="btn-retry" class="btn btn--primary">تلاش مجدد</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       HOME SCREEN
+  ══════════════════════════════════════════════ -->
+  <div id="screen-home" class="screen" aria-label="صفحه اصلی">
+    <header class="home-header">
+      <h1 class="home-title">بازی فلش</h1>
+      <p class="home-subtitle">فلش‌ها را بچرخان تا همه هم‌راستا شوند</p>
+    </header>
+
+    <section class="home-stats" aria-label="آمار بازیکن">
+      <div class="stat-card">
+        <span class="stat-label">بهترین امتیاز</span>
+        <span id="home-best-score" class="stat-value">۰</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">مرحله</span>
+        <span id="home-level" class="stat-value">۱</span>
+      </div>
+    </section>
+
+    <section class="home-actions">
+      <button id="btn-play" class="btn btn--primary btn--large">
+        <span aria-hidden="true">▶</span> شروع بازی
+      </button>
+      <button id="btn-leaderboard" class="btn btn--secondary">
+        <span aria-hidden="true">🏆</span> جدول امتیازات
+      </button>
+      <button id="btn-how-to-play" class="btn btn--ghost">
+        <span aria-hidden="true">?</span> نحوه بازی
+      </button>
+    </section>
+
+    <p id="home-username" class="home-player" aria-label="نام کاربری"></p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       HOW TO PLAY SCREEN
+  ══════════════════════════════════════════════ -->
+  <div id="screen-howto" class="screen" aria-label="نحوه بازی">
+    <div class="howto-inner">
+      <h2 class="howto-title">نحوه بازی</h2>
+      <ol class="howto-list">
+        <li>هر خانه دارای یک فلش با جهت مشخص است.</li>
+        <li>روی هر فلش ضربه بزنید تا ۴۵ درجه در جهت ساعتگرد بچرخد.</li>
+        <li>هدف: همه فلش‌های هر سطر یا ستون باید به سمت خانه هدف (★) اشاره کنند.</li>
+        <li>بازی با کمترین تعداد حرکت، بیشترین امتیاز را می‌دهد.</li>
+        <li>مراحل سخت‌تر، شبکه بزرگ‌تری دارند.</li>
+      </ol>
+      <div class="howto-demo" aria-label="نمونه فلش‌ها">
+        <div class="demo-grid">
+          <span class="demo-arrow" style="--rot:0deg">↑</span>
+          <span class="demo-arrow" style="--rot:45deg">↗</span>
+          <span class="demo-arrow" style="--rot:90deg">→</span>
+          <span class="demo-arrow" style="--rot:135deg">↘</span>
+          <span class="demo-arrow" style="--rot:180deg">↓</span>
+          <span class="demo-arrow" style="--rot:225deg">↙</span>
+          <span class="demo-arrow" style="--rot:270deg">←</span>
+          <span class="demo-arrow" style="--rot:315deg">↖</span>
+        </div>
+        <p class="demo-caption">هشت جهت ممکن برای هر فلش</p>
+      </div>
+      <button id="btn-howto-back" class="btn btn--secondary">بازگشت</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       LEVEL SELECT SCREEN
+  ══════════════════════════════════════════════ -->
+  <div id="screen-levels" class="screen" aria-label="انتخاب مرحله">
+    <header class="levels-header">
+      <h2 class="levels-title">انتخاب مرحله</h2>
+    </header>
+    <div id="levels-grid" class="levels-grid" role="list" aria-label="مراحل بازی">
+      <!-- populated by JS -->
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       GAME SCREEN
+  ══════════════════════════════════════════════ -->
+  <div id="screen-game" class="screen" aria-label="صفحه بازی">
+
+    <!-- HUD -->
+    <header class="game-hud" role="banner">
+      <div class="hud-item">
+        <span class="hud-label">مرحله</span>
+        <span id="hud-level" class="hud-value">۱</span>
+      </div>
+      <div class="hud-item hud-item--center">
+        <span class="hud-label">حرکت</span>
+        <span id="hud-moves" class="hud-value">۰</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">امتیاز</span>
+        <span id="hud-score" class="hud-value">۰</span>
+      </div>
+    </header>
+
+    <!-- Puzzle grid container -->
+    <main class="game-board-wrap" aria-label="شبکه بازی">
+      <div id="game-board" class="game-board" role="grid" aria-label="فلش‌های بازی">
+        <!-- cells injected by JS -->
+      </div>
+    </main>
+
+    <!-- In-game actions -->
+    <footer class="game-footer">
+      <button id="btn-restart" class="btn btn--icon" aria-label="شروع مجدد مرحله" title="شروع مجدد">↺</button>
+      <div class="game-progress-wrap" aria-label="پیشرفت">
+        <div id="game-progress" class="game-progress-bar" role="progressbar"
+             aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+      </div>
+      <button id="btn-hint" class="btn btn--icon btn--hint" aria-label="راهنمایی" title="راهنمایی">💡</button>
+    </footer>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       WIN OVERLAY (inside game screen)
+  ══════════════════════════════════════════════ -->
+  <div id="overlay-win" class="overlay overlay--hidden" role="dialog" aria-modal="true" aria-label="پیروزی">
+    <div class="overlay-card">
+      <p class="win-icon" aria-hidden="true">★</p>
+      <h2 class="win-title">آفرین!</h2>
+      <p class="win-level-label">مرحله <span id="win-level">۱</span> را تمام کردید</p>
+      <div class="win-stats">
+        <div class="win-stat">
+          <span class="win-stat-label">حرکت</span>
+          <span id="win-moves" class="win-stat-value">۰</span>
+        </div>
+        <div class="win-stat">
+          <span class="win-stat-label">امتیاز</span>
+          <span id="win-score" class="win-stat-value">۰</span>
+        </div>
+        <div class="win-stat">
+          <span class="win-stat-label">بهترین</span>
+          <span id="win-best" class="win-stat-value">۰</span>
+        </div>
+      </div>
+      <div class="win-actions">
+        <button id="btn-next-level" class="btn btn--primary">مرحله بعد</button>
+        <button id="btn-win-menu"   class="btn btn--ghost">منو</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       LEADERBOARD SCREEN
+  ══════════════════════════════════════════════ -->
+  <div id="screen-leaderboard" class="screen" aria-label="جدول امتیازات">
+    <header class="lb-header">
+      <h2 class="lb-title">جدول امتیازات</h2>
+    </header>
+    <div id="lb-list" class="lb-list" role="list" aria-label="برترین بازیکنان">
+      <!-- populated by JS -->
+    </div>
+    <div id="lb-loading" class="lb-loading" aria-live="polite">در حال بارگذاری…</div>
+    <div id="lb-empty"   class="lb-empty   hidden">هنوز امتیازی ثبت نشده.</div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       APP ENTRY POINT
+  ══════════════════════════════════════════════ -->
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>
