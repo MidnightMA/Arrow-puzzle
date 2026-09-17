@@ -1,0 +1,14 @@
+project_id = "arrow-puzzle"
+
+[api]
+port = 54321
+schemas = ["public"]
+extra_search_path = ["public"]
+max_rows = 100
+
+[db]
+port = 54322
+
+[edge_runtime]
+enabled = true
+port = 54323
